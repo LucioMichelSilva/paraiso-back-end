@@ -1,0 +1,24 @@
+{
+    "development": {
+      "username": "paraiso",
+      "password": "paraiso",
+      "database": "paraiso",
+      "host": "localhost",
+      "dialect": "mysql"
+    },
+    "test": {
+      "username": "paraiso",
+      "password": "paraiso",
+      "database": "paraiso",
+      "host": "localhost",
+      "dialect": "mysql"
+    },
+    "production": {
+      "username": "paraiso",
+      "password": "paraiso",
+      "database": "paraiso",
+      "host": "localhost",
+      "dialect": "mysql"
+    }
+  }
+  
