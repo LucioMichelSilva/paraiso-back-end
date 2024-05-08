@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const Image = require('../models/Image');
+const Service = require('../models/Service');
 const { Op } = require('sequelize');
 
 // Configuração do multer para lidar com o upload de imagens
@@ -83,34 +84,37 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-
-// Alteração na rota para buscar fotos agrupadas por cliente e createdAt
 router.get('/grouped/:clientId', async (req, res) => {
   try {
     const { clientId } = req.params;
 
-    // Buscar todas as imagens do cliente especificado
+    // Buscar todas as imagens do cliente especificado, incluindo a descrição do serviço
     const images = await Image.findAll({
       where: { clientId }, // Filtra as imagens pelo clientId
-      attributes: ['id', 'data', 'createdAt'],
+      include: [{
+        model: Service,
+        attributes: ['name'] // Inclui apenas a descrição do serviço
+      }],
+      attributes: ['id', 'data', 'createdAt', 'serviceId'],
       order: [['createdAt', 'DESC']],
     });
 
-    // Agora precisamos agrupar as imagens manualmente por createdAt
+    // Agora precisamos agrupar as imagens manualmente por serviço e createdAt
     let groupedPhotos = images.reduce((acc, image) => {
-      const createdAt = image.createdAt.toISOString().split('T')[0]; // Formata a data para YYYY-MM-DD
-      if (!acc[createdAt]) {
-        acc[createdAt] = [];
+      const { serviceId, createdAt } = image;
+      const serviceName = image.Service.name;
+      const date = createdAt.toISOString().split('T')[0]; // Formata a data para YYYY-MM-DD
+
+      const key = `${serviceId}_${date}`;
+      if (!acc[key]) {
+        acc[key] = { serviceId, serviceName, createdAt: date, photos: [] };
       }
-      acc[createdAt].push({ id: image.id, photoBuffer: image.data.toString('base64') }); // Convertendo buffer para string base64
+      acc[key].photos.push({ id: image.id, photoBuffer: image.data.toString('base64') }); // Convertendo buffer para string base64
       return acc;
     }, {});
 
     // Transformar o objeto em um array no formato desejado
-    let result = Object.keys(groupedPhotos).map(date => ({
-      createdAt: date,
-      photos: groupedPhotos[date]
-    }));
+    let result = Object.values(groupedPhotos);
 
     res.json(result);
   } catch (error) {
