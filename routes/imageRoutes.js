@@ -3,6 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const Image = require('../models/Image');
 const Service = require('../models/Service');
+const Client = require('../models/Client');
 const { Op } = require('sequelize');
 
 // Configuração do multer para lidar com o upload de imagens

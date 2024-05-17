@@ -21,6 +21,7 @@ app.use(cors({
 app.use(express.json());
 app.use(bodyParser.json());
 
+// Criando aliases para as rotas
 app.use('/services', serviceRoutes);
 app.use('/clients', clientRoutes);
 app.use('/images', imageRoutes);
@@ -35,5 +36,5 @@ sequelize.sync().then(() => {
 });
 
 app.listen(PORT, hostname, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on http://${hostname}:${PORT}`);
 });
